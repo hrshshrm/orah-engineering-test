@@ -29,23 +29,36 @@ export class RollController {
   async updateRoll(request: Request, response: Response, next: NextFunction) {
     const { body: params } = request
 
-    this.rollRepository.findOne(params.id).then((roll) => {
+    const rollToUpdate = await this.rollRepository.findOne(params.id)
+    if(rollToUpdate) {
       const updateRollInput: UpdateRollInput = {
         id: params.id,
         name: params.name,
         completed_at: params.completed_at,
       }
-      roll.prepareToUpdate(updateRollInput)
-      return this.rollRepository.save(roll)
-    })
+      rollToUpdate.prepareToUpdate(updateRollInput)
+      return this.rollRepository.save(rollToUpdate)
+    } else {
+      response.status(400)
+      return {
+        "message": `Role with ID '${params.id}' not found.`
+      }
+    }
   }
 
   async removeRoll(request: Request, response: Response, next: NextFunction) {
     let rollToRemove = await this.rollRepository.findOne(request.params.id)
-    await this.rollRepository.remove(rollToRemove)
+    if(rollToRemove) {
+      return this.rollRepository.remove(rollToRemove)
+    } else {
+      response.status(400)
+      return {
+        "message": `Role with ID '${request.params.id}' not found.`
+      }
+    }
   }
 
-  async getRoll(request: Request, response: Response, next: NextFunction) {
+  async getStudentRollStates(request: Request, response: Response, next: NextFunction) {
     return this.studentRollStateRepository.find({ roll_id: request.params.id })
   }
 
@@ -76,21 +89,28 @@ export class RollController {
     }
     const studentRollState = new StudentRollState()
     studentRollState.prepareToCreate(createStudentRollStateInput)
+
     return this.studentRollStateRepository.save(studentRollState)
   }
 
   async updateStudentRollState(request: Request, response: Response, next: NextFunction) {
     const { body: params } = request
 
-    this.studentRollStateRepository.findOne(params.id).then((studentRollState) => {
+    const toUpdate = await this.studentRollStateRepository.findOne(params.id)
+    if(toUpdate) {
       const updateStudentRollStateInput: UpdateStudentRollStateInput = {
         id: params.id,
         roll_id: params.roll_id,
         student_id: params.student_id,
         state: params.state,
       }
-      studentRollState.prepareToUpdate(updateStudentRollStateInput)
-      return this.studentRollStateRepository.save(studentRollState)
-    })
+      toUpdate.prepareToUpdate(updateStudentRollStateInput)
+      return this.studentRollStateRepository.save(toUpdate)
+    } else {
+      response.status(400)
+      return {
+        "message": `Student Role State with ID '${request.params.id}' not found.`
+      }
+    }
   }
 }

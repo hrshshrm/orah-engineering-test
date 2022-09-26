@@ -19,6 +19,10 @@ servers:
 tags:
   - name: student
     description: Student Lifecycle APIs
+  - name: roll
+    description: Roll Lifecycle APIs
+  - name: student-roll-state
+    description: Student-Roll-State Lifecycle APIs
 paths:
   /student/get-all:
       get:
@@ -117,7 +121,7 @@ paths:
                 schema:
                   $ref: '#/components/schemas/ErrorResponse'
   /student/delete/{id}:
-    get:
+    delete:
       tags:
         - student
       summary: Delete given Student
@@ -132,6 +136,208 @@ paths:
             application/json:
               schema:
                   $ref: '#/components/schemas/StudentResponse'          
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+
+  /roll/get-all:
+      get:
+        tags:
+          - roll
+        summary: Find all roll
+        description: Finds the list of all roll
+        operationId: allRolls
+        responses:
+          '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/RollResponse'
+          '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /roll/create:
+    post:
+      tags:
+        - roll
+      summary: Create Roll
+      description: Create Roll with given details
+      operationId: createRoll
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RollData'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/RollResponse'
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /roll/update:
+    put:
+      tags:
+        - roll
+      summary: Update Roll
+      description: Update given Roll with details
+      operationId: updateRoll
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RollResponse'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/RollResponse'
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /roll/delete/{id}:
+    delete:
+      tags:
+        - roll
+      summary: Delete given Roll
+      description: Delete details of given Roll
+      operationId: removeRoll
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/RollResponse'          
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  
+  /roll/get-by-id/{id}:
+    get:
+      tags:
+        - student-roll-state
+      summary: Find all Student-Role-States
+      description: Finds list of all Student-Role-States
+      operationId: getStudentRollStates
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/StudentRollStateResponse'          
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /roll/add-student-states:
+    post:
+      tags:
+        - student-roll-state
+      summary: Create Student-Role-States
+      description: Create Student-Role-States with given details
+      operationId: addStudentRollStates
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/schemas/StudentRollStateData'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudentRollStateResponse'
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /roll/add-student-roll-state:
+    post:
+      tags:
+        - student-roll-state
+      summary: Create Student-Role-State
+      description: Create Student-Role-State with given details
+      operationId: addStudentRollState
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentRollStateData'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/StudentRollStateResponse'
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /roll/update-student-roll-state:
+    put:
+      tags:
+        - student-roll-state
+      summary: Update Student-Role-State
+      description: Update given Student-Role-State with details
+      operationId: updateStudentRollState
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentRollStateResponse'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/StudentRollStateResponse'
         '400':
             description: Invalid Input value 
             content:
@@ -170,6 +376,47 @@ components:
               type: integer
               example: 12
         - $ref: '#/components/schemas/StudentData'
+
+    RollData:
+      type: object
+      properties:
+        name:
+          type: string
+          example: Roll Name
+        completed_at:
+          type: string
+          example: YYYY-MM-DD
+    RollResponse:
+      allOf:
+        - type: object
+          properties:
+            id: 
+              type: integer
+              example: 12
+        - $ref: '#/components/schemas/RollData'
+        
+    StudentRollStateData:
+      type: object
+      properties:
+        student_id: 
+          type: integer
+          example: 1
+        roll_id:
+          type: integer
+          example: 2
+        state:
+          type: string
+          enum: [unmark, present, absent, late]
+    StudentRollStateResponse:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              example: 12
+        - $ref: '#/components/schemas/StudentRollStateData'
+          
+      
 
     ErrorResponse:
       type: object
