@@ -1,0 +1,180 @@
+openapi: 3.0.3
+info:
+  title: Orah Engineering Test - Backend
+  description: |-
+    This is the Backend Engineering Test for Orah.
+
+    Some useful links:
+    - [The Test Repository](https://github.com/BoardingwareLtd/orah-engineering-test)
+    - [The Solution Repository](https://github.com/hrshshrm/orah-engineering-test/tree/solution)
+  termsOfService: https://www.orahapps.com/terms
+  contact:
+    email: sharmaharshy@gmail.com
+  version: 0.0.1
+externalDocs:
+  description: Find out more about Orah
+  url: https://www.orah.com/about
+servers:
+  - url: http://localhost:4001
+tags:
+  - name: student
+    description: Student Lifecycle APIs
+paths:
+  /student/get-all:
+      get:
+        tags:
+          - student
+        summary: Find all Students
+        description: Finds the list of all students
+        operationId: allStudents
+        responses:
+          '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/StudentResponse'          
+          '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /student/get-by-id/{id}:
+    get:
+      tags:
+        - student
+      summary: Find given Student
+      description: Finds details of given students
+      operationId: getStudent
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/StudentResponse'          
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /student/create:
+    post:
+      tags:
+        - student
+      summary: Create Student
+      description: Create student with given details
+      operationId: createStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentData'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/StudentResponse'
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /student/update:
+    put:
+      tags:
+        - student
+      summary: Update Student
+      description: Update student with given details
+      operationId: updateStudent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/StudentData'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/StudentResponse'
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /student/delete/{id}:
+    get:
+      tags:
+        - student
+      summary: Delete given Student
+      description: Delete details of given students
+      operationId: removeStudent
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/StudentResponse'          
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  parameters:
+    id:
+      name: id
+      in: path
+      description: id of the given entity
+      required: true
+      schema:
+        type: string
+
+  schemas:
+    StudentData:
+      type: object
+      properties:
+        first_name:
+          type: string
+          example: Name
+        last_name:
+          type: string
+          example: Surname
+        photo_url:
+          type: string
+          example: https://picsum.photos/200
+    StudentResponse:
+      allOf:
+        - type: object
+          properties:
+            id: 
+              type: integer
+              example: 12
+        - $ref: '#/components/schemas/StudentData'
+
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+          example: Error Message String
+
