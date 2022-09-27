@@ -23,6 +23,8 @@ tags:
     description: Roll Lifecycle APIs
   - name: student-roll-state
     description: Student-Roll-State Lifecycle APIs
+  - name: group
+    description: Group Lifecycle APIs
 paths:
   /student/get-all:
       get:
@@ -345,6 +347,103 @@ paths:
                 schema:
                   $ref: '#/components/schemas/ErrorResponse'
 
+  /group/get-all:
+      get:
+        tags:
+          - group
+        summary: Find all groups
+        description: Finds the list of all groups
+        operationId: allGroups
+        responses:
+          '200':
+            description: successful operation
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/GroupResponse'
+          '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /group/create:
+    post:
+      tags:
+        - group
+      summary: Create Group
+      description: Create Group with given details
+      operationId: createGroup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupData'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/GroupResponse'
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /group/update:
+    put:
+      tags:
+        - group
+      summary: Update Group
+      description: Update given Group with details
+      operationId: updateGroup
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GroupResponse'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/GroupResponse'
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+  /group/delete/{id}:
+    delete:
+      tags:
+        - group
+      summary: Delete given Group
+      description: Delete details of given Group
+      operationId: removeGroup
+      parameters:
+        - $ref: '#/components/parameters/id'
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                  $ref: '#/components/schemas/GroupResponse'          
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+
 components:
   parameters:
     id:
@@ -415,8 +514,39 @@ components:
               type: integer
               example: 12
         - $ref: '#/components/schemas/StudentRollStateData'
-          
-      
+
+    GroupData:
+      type: object
+      properties:
+        name: 
+          type: string
+          example: Frequently late students
+        number_of_weeks: 
+          type: number
+          example: 2
+        roll_states:
+          type: string
+          enum: [unmark, present, absent, late]
+        incidents:
+          type: number
+          example: 3
+        ltmt:
+          type: string
+          enum: ['<', '>']
+    GroupResponse:
+      allOf:
+        - type: object
+          properties:
+            id: 
+              type: number
+              example: 12
+            run_at: 
+              type: string
+              example: YYYY-MM-DD
+            student_count:
+              type: number
+              example: 15
+        - $ref: '#/components/schemas/GroupData'
 
     ErrorResponse:
       type: object
