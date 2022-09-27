@@ -25,29 +25,31 @@ tags:
     description: Student-Roll-State Lifecycle APIs
   - name: group
     description: Group Lifecycle APIs
+  - name: group-student
+    description: Group_Student Lifecycle APIs
 paths:
   /student/get-all:
-      get:
-        tags:
-          - student
-        summary: Find all Students
-        description: Finds the list of all students
-        operationId: allStudents
-        responses:
-          '200':
-            description: successful operation
-            content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/StudentResponse'          
-          '400':
-            description: Invalid Input value 
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - student
+      summary: Find all Students
+      description: Finds the list of all students
+      operationId: allStudents
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/StudentResponse'          
+        '400':
+          description: Invalid Input value 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /student/get-by-id/{id}:
     get:
       tags:
@@ -146,27 +148,27 @@ paths:
                   $ref: '#/components/schemas/ErrorResponse'
 
   /roll/get-all:
-      get:
-        tags:
-          - roll
-        summary: Find all roll
-        description: Finds the list of all roll
-        operationId: allRolls
-        responses:
-          '200':
-            description: successful operation
-            content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/RollResponse'
-          '400':
-            description: Invalid Input value 
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - roll
+      summary: Find all roll
+      description: Finds the list of all roll
+      operationId: allRolls
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RollResponse'
+        '400':
+          description: Invalid Input value 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /roll/create:
     post:
       tags:
@@ -241,7 +243,7 @@ paths:
               application/json:
                 schema:
                   $ref: '#/components/schemas/ErrorResponse'
-  
+
   /roll/get-by-id/{id}:
     get:
       tags:
@@ -348,27 +350,27 @@ paths:
                   $ref: '#/components/schemas/ErrorResponse'
 
   /group/get-all:
-      get:
-        tags:
-          - group
-        summary: Find all groups
-        description: Finds the list of all groups
-        operationId: allGroups
-        responses:
-          '200':
-            description: successful operation
-            content:
-              application/json:
-                schema:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/GroupResponse'
-          '400':
-            description: Invalid Input value 
-            content:
-              application/json:
-                schema:
-                  $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - group
+      summary: Find all groups
+      description: Finds the list of all groups
+      operationId: allGroups
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupResponse'
+        '400':
+          description: Invalid Input value 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
   /group/create:
     post:
       tags:
@@ -444,6 +446,30 @@ paths:
                 schema:
                   $ref: '#/components/schemas/ErrorResponse'
 
+  /group/get-students-in-group/{id}:
+    get:
+      tags:
+        - group-student
+      summary: Find all group students
+      description: Finds the list of all students for given group
+      parameters:
+        - $ref: '#/components/parameters/id'
+      operationId: getGroupStudents
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupStudentsData'
+        '400':
+          description: Invalid Input value 
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   parameters:
     id:
@@ -547,6 +573,22 @@ components:
               type: number
               example: 15
         - $ref: '#/components/schemas/GroupData'
+        
+    GroupStudentsData:
+      type: object
+      properties:
+        id: 
+          type: number
+          example: 12
+        first_name:
+          type: string
+          example: Name
+        last_name:
+          type: string
+          example: Surame
+        full_name:
+          type: string
+          example: Name Surname
 
     ErrorResponse:
       type: object

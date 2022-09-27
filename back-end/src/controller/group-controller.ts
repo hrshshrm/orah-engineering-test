@@ -3,9 +3,11 @@ import { NextFunction, Request, Response } from "express"
 
 import { Group } from "../entity/group.entity"
 import { CreateGroupInput, UpdateGroupInput } from "../interface/group.interface"
+import { Student } from "../entity/student.entity"
 
 export class GroupController {
   private groupRepository = getRepository(Group)
+  private studentRepository = getRepository(Student)
 
   async allGroups(request: Request, response: Response, next: NextFunction) {
     // Task 1: Return the list of all groups
@@ -104,9 +106,26 @@ export class GroupController {
   }
 
   async getGroupStudents(request: Request, response: Response, next: NextFunction) {
-    // Task 1: 
-        
-    // Return the list of Students that are in a Group
+    // Task 1: Return the list of Students that are in a Group
+    const { params: params } = request
+
+    const groupToRemove = await this.groupRepository.findOne(params.id)
+    if(groupToRemove) {
+      // SELECT s.id, s.first_name, s.last_name, s.first_name || ' ' || s.last_name AS full_name FROM student AS s LEFT JOIN group_student AS gs ON s.id = gs.student_id WHERE gs.group_id = '${params.id}'
+      const students = await this.studentRepository
+        .createQueryBuilder('s')
+        .select(['s.id AS id', 's.first_name AS first_name', 's.last_name AS last_name', 's.first_name || " " || s.last_name AS full_name' ])
+        .leftJoin('group_student', 'gs')
+        .where('s.id = gs.student_id')
+        .andWhere('gs.group_id = :gid', { gid: params.id})
+        .getRawMany()
+      return students
+    } else {
+      response.status(400)
+      return {
+        "message": `Group with ID '${params.id}' not found.`
+      }
+    }
   }
 
 
