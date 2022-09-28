@@ -26,7 +26,7 @@ tags:
   - name: group
     description: Group Lifecycle APIs
   - name: group-student
-    description: Group_Student Lifecycle APIs
+    description: Group-Student Lifecycle APIs
 paths:
   /student/get-all:
     get:
@@ -470,6 +470,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
+  /group/run-group-filters:
+    post:
+      tags:
+        - group-student
+      summary: Run Group Filter
+      description: Run Group Filter for all Groups
+      operationId: runGroupFilters
+      responses:
+        '200':
+          description: successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GroupFilterResponse'
+        '400':
+            description: Invalid Input value 
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/ErrorResponse'
+      
 components:
   parameters:
     id:
@@ -589,6 +612,21 @@ components:
         full_name:
           type: string
           example: Name Surname
+    GroupFilterResponse:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 2
+        name: 
+          type: string
+          example: Group Name
+        run_at:
+          type: string
+          example: YYYY-MM-DD
+        student_count:
+          type: number
+          example: 10
 
     ErrorResponse:
       type: object

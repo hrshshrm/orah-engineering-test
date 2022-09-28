@@ -6,6 +6,9 @@ node_modules
 # testing
 /coverage
 
+# data 
+back-end/data
+
 # build
 front-end/dist
 
