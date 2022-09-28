@@ -139,47 +139,54 @@ export class GroupController {
     // 1. Clear out the groups (delete all the students from the groups)
     // 2. For each group, query the student rolls to see which students match the filter for the group
     // 3. Add the list of students that match the filter to the group
-    const result = []
+    try {
+      const result = []
+      const [ groups ] = await Promise.all([ await this.groupRepository.find(), this.groupStudentRepository.clear() ])
 
-    await this.groupStudentRepository.clear()
-    const groups = await this.groupRepository.find()
+      for(const group of groups) {
+        const rollStates = group.roll_states.split(',')
+        const numberOfDays = group.number_of_weeks * 7
+        const startDate = new Date(new Date().setDate(new Date().getDate() - numberOfDays)).toISOString()
+        const endDate = new Date().toISOString()
 
-    for(const group of groups) {
-      const rollStates = group.roll_states.split(',')
-      const numberOfDays = group.number_of_weeks * 7
-      const startDate = new Date(new Date().setDate(new Date().getDate() - numberOfDays)).toISOString()
-      const endDate = new Date().toISOString()
+        const incidentData = await this.studentRollStateRepository.createQueryBuilder('srs')
+          .select(['srs.student_id AS student_id', `${group.id} AS group_id`, 'COUNT(*) AS incident_count'])
+          .leftJoin('roll', 'r')
+          .where('r.id = srs.roll_id')
+          .andWhere('srs.state IN (:...states)', { states: rollStates })
+          .andWhere('r.completed_at BETWEEN :start AND :end', { start: startDate, end: endDate })
+          .groupBy('srs.student_id')
+          .having(`incident_count ${group.ltmt} ${group.incidents}`)
+          .getRawMany()
 
-      const incidentData = await this.studentRollStateRepository.createQueryBuilder('srs')
-        .select(['srs.student_id AS student_id', `${group.id} AS group_id`, 'COUNT(*) AS incident_count'])
-        .leftJoin('roll', 'r')
-        .where('r.id = srs.roll_id')
-        .andWhere('srs.state IN (:...states)', { states: rollStates })
-        .andWhere('r.completed_at BETWEEN :start AND :end', { start: startDate, end: endDate })
-        .groupBy('srs.student_id')
-        .having(`COUNT(*) ${group.ltmt} ${group.incidents}`)
-        .getRawMany()
+        const groupStudentList = incidentData.map(async (data) => {
+          const createGroupStudentInput: CreateGroupStudentInput = {
+            student_id: data.student_id,
+            group_id: data.group_id,
+            incident_count: data.incident_count
+          }
+          const groupStudent = new GroupStudent()
+          groupStudent.prepareToCreate(createGroupStudentInput)
+          return this.groupStudentRepository.save(groupStudent)
+        })
+        await Promise.all(groupStudentList)
 
-      incidentData.forEach(async (data) => {
-        const createGroupStudentInput: CreateGroupStudentInput = {
-          student_id: data.student_id,
-          group_id: data.group_id,
-          incident_count: data.incident_count
+        const updateGroupInput: UpdateGroupInput = {
+          id: group.id,
+          run_at: new Date(endDate),
+          student_count: incidentData.length
         }
-        const groupStudent = new GroupStudent()
-        groupStudent.prepareToCreate(createGroupStudentInput)
-        await this.groupStudentRepository.save(groupStudent)
-      })
-
-      const updateGroupInput: UpdateGroupInput = {
-        id: group.id,
-        run_at: new Date(startDate),
-        student_count: incidentData.length
+        await this.groupRepository.save(updateGroupInput)
+        result.push({ name: group.name, ...updateGroupInput })
       }
-      await this.groupRepository.save(updateGroupInput)
-      result.push({ name: group.name, ...updateGroupInput })
-    }
 
-    return result
+      return result
+    } catch(error) {
+      console.log(`runGroupFilters failed | ${error.message}`)
+      response.status(500)
+      return {
+        message: "Could complete runGroupFilters. Server Error."
+      }
+    }
   }
 }
